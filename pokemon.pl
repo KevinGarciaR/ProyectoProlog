@@ -40,9 +40,10 @@ assert(pokebolasJugador([
 				 [negra,100,90]
 				])),
 %Lista con los Huevos  con los que cueta el jugador
-assert(huevosJugador([[electrico,80],												
+assert(huevosJugador([
+			   [electrico,80],												
 			   [electrico,80],
-			   [electrico,80],
+			   [fuego,100],
 			   [electrico,80]
 			 ])), 
 %Lista con los Pokemones con los que cuenta el jugador
@@ -217,15 +218,70 @@ tiendaCompraPokebola(Dinero,PrecioPokebola,_):-
 %Inicio del juego
 juegoPokemon:-
   inicializarVariables,
-  caminarASiguienteCiudad.
-  %llegasASiguienteCiudad.
+  caminarASiguienteCiudad,
+  llegasASiguienteCiudad.
+ 
+ llegasASiguienteCiudad:-
+  ciudadActual(CiudadActual),
+  ciudadDestino(CiudadDestino),
+
+  write("Has llegado a la ciudad "),write(CiudadDestino),write(", que deseas hacer: "),nl,
+  distancia2(CiudadActual,CiudadDestino,Distancia),
+  opcionesDeCiudad.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+huevoEvolucionPricipal():-
+write("").
+
+
+huevoEvolucionar(Distancia,Huevo):-	%Pokemon que ha (eclosionado) 
+	Huevo=[Tipo,DEvolucion],
+	Distancia>=DEvolucion,
+	write("Feliciadades  un huevo de tipo "),write(Tipo), write(", a eclosionado"),nl,
+	huevoEvolucionadoFinal(Huevo,PokemonEvolucionado),
+	
+	huevosJugador(HuevosJugador),
+	pokemonesJugador(PokemonesJugador),
+	NListaPokemones=[PokemonEvolucionado|PokemonesJugador],
+	retractall(pokemonesJugador(_)),
+	assert(pokemonesJugador(NListaPokemones)),
+
+	eliminarElemento(Huevo,HuevosJugador,NlistaHuevos),
+	retractall(huevosJugador(_)),
+	assert(huevosJugador(NlistaHuevos)).
+	
+	
+
+huevoEvolucionar(Distancia,Huevo):-   %Huevo que no ha eclosionado
+	Huevo=[N,DEvolucion],
+	NuevaDistancia is DEvolucion-Distancia,
+	HuevoActualizado=[N,NuevaDistancia],
+
+	huevosJugador(HuevosJugador),
+	eliminarElemento(Huevo,HuevosJugador,Lista),
+	retractall(huevosJugador(_)),
+	NlistaHuevos2 = [ HuevoActualizado|Lista],
+	assert(huevosJugador(NlistaHuevos2)).
+
+huevoEvolucionadoFinal(Huevo,HuevoEvolucionado):-
+	pokemones(Pokemones),
+	random_permutation(Pokemones,PokemonesRevueltos),
+	Huevo=[TipoH,_],
+	member([Nombre,TipoH|Cola],PokemonesRevueltos),	
+	HuevoEvolucionado=[Nombre,TipoH|Cola].	
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  
 
 caminarASiguienteCiudad:-
-  preguntarCiudad(CiudadParaIr),
+  preguntarCiudad,
   random(1,4, Random),
-  posibilidadAlCaminar(Random),
-  write("Has llegado a la ciudad "),write(CiudadParaIr),write(", que deseas hacer: "),nl,
-  opcionesDeCiudad.
+  posibilidadAlCaminar(Random).
+
+ 
 
 %Encontro pokebola en el trayecto
 posibilidadAlCaminar(1):-
@@ -548,7 +604,7 @@ agregarHuevoALaMochila(NuevoHuevo):-
 	assert(huevosJugador([NuevoHuevo|Huevos])),
 	write("Se agrego exitosamente el huevo a la mochila"),nl.
 
-preguntarCiudad(CiudadParaIr):-
+preguntarCiudad:-
 	ciudadActual(CiudadActual),
 	mostrarOpcionesDeViaje(CiudadActual), 
 	ciudades(X),
@@ -560,9 +616,9 @@ preguntarCiudad(CiudadParaIr):-
 	assert(ciudadDestino(CiudadParaIr)).
 
 
-preguntarCiudad(CiudadParaIr):-
+preguntarCiudad:-
 	write("No es valida esa ciudad"),nl,
-	preguntarCiudad(CiudadParaIr).
+	preguntarCiudad.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%&&&&&&&&&&&&&&&&&&&&&&&&&&&
