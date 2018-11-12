@@ -10,31 +10,62 @@ Integrantes:
 	huevosJugador/1,
 	pokemonesJugador/1,
 	pokemonesPeleando/2,
-	pokemonesconBill/1.
+	pokemonesconBill/1,
+	dineroJugador/1.
 
-
-
-%Pokebolas y huevos iniciales
 %Nombre, costo, probabilidad de atrapar el Pokemon
 pokebolas([[normal,30,40],[azul,60,60],[negra,100,90]]).
+
+inicializarVariables:-
+% Borrar información del Estado
+retractall(pokebolasJugador(_)),
+retractall(huevosJugador(_)),
+retractall(pokemonesJugador(_)),
+retractall(pokemonesPeleando(_)),
+retractall(pokemonesconBill(_)),
+retractall(dineroJugador(_)),
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%                 Estado del Juego                 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Lista con las pokebola que cuenta el Jugador
+assert(pokebolasJugador([
+				 [normal,30,40],
+				 [azul,60,60],
+				 [negra,100,90]
+				])),
+%Lista con los Huevos  con los que cueta el jugador
+assert(huevosJugador([[electrico,80],												
+			   [electrico,80],
+			   [electrico,80],
+			   [electrico,80]
+			 ])), 
+%Lista con los Pokemones con los que cuenta el jugador
+assert(pokemonesJugador([[pikachu,  electrico,60,[ impactrueno,   cabezazo,	tacleada,	chispa],    muerto, 1, 0],
+				  [voltorb,  electrico,10,[ agilidad,      destello,    impactrueno,chispa],	muerto, 1, 0]])),
+
+%Lista con los objetos que se envian a Bill
+assert(pokemonesconBill([])),
+%Saldo del jugador
+assert(dineroJugador(1000)).
+
+% Fin del Estado del Juego
+
 %Tipo, distancia para nacer
 huevos([[electrico,80],[agua,60],[fuego,90],[normal,30],[tierra,50]]).
 
-%pokemones
-%Nombre, tipo, salud, ataques, estado, nivel, experiencia
+% pokemones: Nombre,     tipo, salud,                  ataques,                    estado, nivel, experiencia
 pokemones([
-		  [pikachu,  electrico,100,[ impactrueno,   cabezazo,	tacleada,	chispa],    vivo, 1, 0],
-		  [electabuzz,electrico,100,[impactrueno,   amago,      grunido,    chispa],    vivo, 1, 0],
-          [voltorb,  electrico,100,[ agilidad,      destello,   impactrueno,chispa],	vivo, 1, 0],
+		  [pikachu,  electrico, 100,[ impactrueno,   cabezazo,	tacleada,	 chispa],    vivo, 1, 0],
+		  [electabuzz,electrico,100,[impactrueno,   amago,      grunido,     chispa],    vivo, 1, 0],
+          [voltorb,  electrico, 100,[ agilidad,      destello,  impactrueno, chispa],	 vivo, 1, 0],
 
-		  [squirtle, agua,100,[burbuja,   cabezazo,     mordisco,         latigo],		vivo, 1, 0],
-		  [croconaw, agua,100,[giro_rapido, placaje,    latigo,           hidropulso],   vivo, 1, 0],
-		  [krabby,   agua,100,[hidropulso,danza ,	    hidrobomba,       burbuja	 ], vivo, 1, 0],
+		  [squirtle, agua,100,  [burbuja,     cabezazo,     mordisco,         latigo],			vivo, 1, 0],
+		  [croconaw, agua,100,  [giro_rapido, placaje,      latigo,           hidropulso],      vivo, 1, 0],
+		  [krabby,   agua,100,  [hidropulso,  danza ,	    hidrobomba,       burbuja	 ], 	vivo, 1, 0],
 
 		  [charmander,fuego,100,[aranazo,  garra_umbria,	pantalla_de_Humo, cuchilla ],     vivo, 1, 0],
 		  [magmar,    fuego,100,[infierno, lanzallamas,     giro_fuego,       grunido],       vivo, 1, 0],
 		  [moltres,   fuego,100,[aranazo,  grunido,         cuchilla,         hidropulso],    vivo, 1, 0],
-		 
+
 		  [ratata,  normal,100,[esfuerzo, doble_filo,   golpe_bajo,       superdiente],   vivo, 1, 0],
 		  [snorlax, normal,100,[esfuerzo, persecucion,  foco_energia,     triturar],      vivo, 1, 0],
 		  [ursaring,normal,100,[finta,    llanto_falso, foco_energia,     ronquido],      vivo, 1, 0],
@@ -45,7 +76,6 @@ pokemones([
 		  ]).
 
 %Ataques NombreAtaque,Total de daño
-
 habilidad(cornada,15).
 habilidad(taladradora,15).
 habilidad(pisoton,10).
@@ -78,7 +108,7 @@ habilidad(danza,8).
 habilidad(hidropulso,20).
 habilidad(placaje,8).
 habilidad(giro_rapido,5).
-habilidad(impactrueno,100).
+habilidad(impactrueno,20).
 habilidad(cabezazo,25).
 habilidad(tacleada,15).
 habilidad(chispa,5).
@@ -117,57 +147,77 @@ distancia(guadalajara,puebla,40).
 distancia(monterrey,tepic,30).
 distancia(monterrey,puebla,50).
 distancia(tepic,puebla,30).
+
 % invertir distancias
 distancia2(Ciudad1,Ciudad2,Distancia):-
 distancia(Ciudad1,Ciudad2,Distancia).
 distancia2(Ciudad1,Ciudad2,Distancia):-
  distancia(Ciudad2,Ciudad1,Distancia).
-% estado del jugador
-dinerojugador(0).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%                    implementada de tienda         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-pokebolasJugador([[normal,30,40],[azul,60,60],[negra,100,90]]).
-pokemonesconBill([]).
-pokemonesJugador([[pikachu,  electrico,100,[ impactrueno,   cabezazo,	tacleada,	chispa],    vivo, 1, 0],
-				[voltorb,  electrico,100,[ agilidad,      destello,   impactrueno,chispa],	vivo, 1, 0]]).
-huevosJugador([[electrico,80],[agua,60],[fuego,90],[normal,30],[tierra,50]]). %Huevos Iniciales
+ tienda:-
+	write("******   Lista de objectos que puedes comprar    ******"),nl,nl,
+	write("Num    Objecto      precio"),nl,
+	write("0   Pokebola norma     30"),nl,
+	write("1   Pokebola azul      60"),nl,
+	write("2   Pokebola negra     100"),nl,
 
+	dineroJugador(Dinero),nl,
+	write("Tu cuentas con un saldo de : "), 
+	write(Dinero),nl,
+	tiendaRespuesta(Dinero).
+
+tiendaRespuesta(Dinero):-
+	write("Seleccione el numero de la opcion deseada : "),nl,
+	read(Respuesta),
+	pokebolas(Pokebolas),
+	nth0(Respuesta,Pokebolas,PokebolaElegida),
+	PokebolaElegida=[_,PrecioPokebola,_],nl,
+	tiendaCompraPokebola(Dinero,PrecioPokebola,PokebolaElegida).
+	
+	
+tiendaRespuesta(Dinero):-
+	write("ERROR: Opcion incorrecta vuelva a intentarlo"),nl,nl,
+	tiendaRespuesta(Dinero).
+
+tiendaCompraPokebola(Dinero,PrecioPokebola,Pokebola):-
+	Dinero > PrecioPokebola,	
+	agregarPokebolaALaMochila(Pokebola),
+	NuevoDinero is Dinero-PrecioPokebola,nl,nl,
+	retractall(dineroJugador(_)),
+	assert(dineroJugador(NuevoDinero)).
+	
+tiendaCompraPokebola(Dinero,PrecioPokebola,_):-
+	write(Dinero),write(PrecioPokebola),nl,
+	write("No cuentas con el saldo suficiente, regresa cuando tengas mas dinero"),nl.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%&&&&&&&&&&&&&&&&&&&&&&&&&&&
+%%%%%%%%%%%%%%%%%%%%%%%%%%%              Opciones principales del juego	      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Inicio del juego
 juegoPokemon:-
+  inicializarVariables,
   caminarASiguienteCiudad.
   %llegasASiguienteCiudad.
 
 caminarASiguienteCiudad:-
   %preguntarCiudad(CiudadParaIr),
-  random(1,3, Random),
-  posibilidadAlCaminar(3).
-
+  random(1,4, Random),
+  posibilidadAlCaminar(Random).
   %cambiarCiudad(CiudadParaIr).
 
-  /*Encontro pokebola*/
+%Encontro pokebola en el trayecto
 posibilidadAlCaminar(1):-
 	write("Has encontrado una pokebola en tu trayecto."),nl,
-	pokebolas(Pokebolas), %unificacion las lista de pokebolas a la variable
+	pokebolas(Pokebolas), 							%unificacion las lista de pokebolas a la variable
 	length(Pokebolas,Longitud),
 	random(0,Longitud, Random),
 	sacarElementoDeLista(Random,Pokebolas,Pokebola),
 	agregarPokebolaALaMochila(Pokebola).
 
-%Encontro un HUEVO
+%Encontro un huevo en el trayecto
 posibilidadAlCaminar(2):-
-write("Has encontrado un Huevo en tu trayecto."),nl,
-	huevos(Huevos), %unificacion las lista de huevos a la variable
-	length(Huevos,Longitud),
-	random(0,Longitud, Random),
-	sacarElementoDeLista(Random,Huevos,Huevo),
-	hayEspacio,
-	agregarHuevoALaMochila(Huevo).
-
-posibilidadAlCaminar(2):-
-	preguntarGuardadoHuevos(Respuesta), % Preguntar se se conservara huevo o se enviara a Bill
-    posibilidadConHuevo(Respuesta,Huevo).
-
-posibilidadConHuevo(Respuesta,Huevo):-
-    preguntarQuePokemonVasaSacar(Indice),
-   	mandarPokemonABill(Indice).
+	encontrarHuevo(_).
 
 posibilidadAlCaminar(3):-
 	sacarPokemonRandom(Pokemon),
@@ -176,20 +226,63 @@ posibilidadAlCaminar(3):-
 	read(Respuesta),
 	respuestaSobrePelea(Respuesta,Pokemon, Cabeza).
 
-respuestaSobrePelea(no,Pokemon,_):-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%&&&&&&&&&&&&&&&&&&&&&&&&&&&
+%%%%%%%%%%%%%%%%%%%%%%%%%%%              Encotrar huevo      				  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+encontrarHuevo(Huevo):-
+	huevos(Huevos), %unificacion las lista de huevos a la variable
+	length(Huevos,Longitud),
+	random(0,Longitud, Random),
+	sacarElementoDeLista(Random,Huevos,Huevo),
+	Huevo=[Cabeza|_],
+	write("Has encontrado un Huevo en tu trayecto, de tipo: "), write(Cabeza),nl,
+	hayEspacio,
+	agregarHuevoALaMochila(Huevo).
+
+encontrarHuevo(Huevo):-
+    preguntarGuardadoHuevos(Respuesta), % Preguntar se se conservara huevo o se enviara a Bill
+    posibilidadConHuevo(Respuesta,Huevo).
+
+posibilidadConHuevo(si,Huevo):-
+    preguntarQuePokemonVasaSacar(Indice),
+   	mandarPokemonABill(Indice),
+   	agregarHuevoALaMochila(Huevo).
+posibilidadConHuevo(no,_):-
+	true.%manda huevo a bill
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%&&&&&&&&&&&&&&&&&&&&&&&&&&&
+%%%%%%%%%%%%%%%%%%%%%%%%%%%              Posibilidad al caminar 3        	  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+sacarPokemonRandom(Pokemon):-
+  	pokemones(PokemonPeleador),
+ 	length(PokemonPeleador, LongitudPokemonesP),
+ 	random(0,LongitudPokemonesP, Random),
+ 	sacarElementoDeLista(Random,PokemonPeleador,Pokemon).
+
+respuestaSobrePelea(Respuesta):-
+	read(Respuesta),
+	estaDentro(Respuesta,[si,no]).
+
+
+
+respuestaSobrePelea(Respuesta):-
+	write("No es valida esa respuesta"),nl,
+	respuestaSobrePelea(Respuesta).
+
+respuestaSobrePelea(no,_,_):-
 write("Te perdiste de un gran Pokemon :(").
 
 respuestaSobrePelea(si,PokemonEnemigo, NombreEnemigo):-
 write("Preparado?"),nl,
 write("Necesitas escoger a un Pokemon para enfrentar a "), write(NombreEnemigo),nl,
     pokemonesJugador(Pokemones),
-	length(Pokemones,LongitudPokemones),
 	impresionListaNumerada(Pokemones),nl,
 	read(Indice),
 	sacarElementoDeLista(Indice,Pokemones,TuPokemon),
 	peleaPokemones(TuPokemon, PokemonEnemigo).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+respuestaSobrePelea(si,PokemonEnemigo, NombreEnemigo):-respuestaSobrePelea(si,PokemonEnemigo, NombreEnemigo).
+
+
 peleaPokemones(Mipokemon,Pokemonenemigo):-
 	ponganseaPelear(Mipokemon,Pokemonenemigo),
 	pokemonesPeleando(MiPokemon1,PokemonEnemigo1),
@@ -199,43 +292,39 @@ peleaPokemones(Mipokemon,Pokemonenemigo):-
 	pokemonesPeleando(MiPokemon3,PokemonEnemigo3),
 	ponganseaPelear(MiPokemon3,PokemonEnemigo3),
 	pokemonesPeleando(MiPokemon4,PokemonEnemigo4),
-	write(" Mi pokemon final:"),write(MiPokemon4),nl,
-	write(" El pokemon enemigo final:"),write(PokemonEnemigo4),nl,
-	quienGano(Mipokemon,MiPokemon4,PokemonEnemigo4). %%%%%%%%%
-
-peleaPokemones(Mipokemon,Pokemonenemigo):-
-	pokemonesPeleando(MiPokemon4,PokemonEnemigo4),
-	write(" Mi pokemon final:"),write(MiPokemon4),nl,
-	write(" El pokemon enemigo final:"),write(PokemonEnemigo4),nl,
+	% write(" Mi pokemon final:"),write(MiPokemon4),nl,
+	% write(" El pokemon enemigo final:"),write(PokemonEnemigo4),nl,
 	quienGano(Mipokemon,MiPokemon4,PokemonEnemigo4). 
-peleaPokemones(_,_).
+
+peleaPokemones(Mipokemon,_):-
+	pokemonesPeleando(MiPokemon4,PokemonEnemigo4),
+	% write(" Mi pokemon final:"),write(MiPokemon4),nl,
+	% write(" El pokemon enemigo final:"),write(PokemonEnemigo4),nl,
+	quienGano(Mipokemon,MiPokemon4,PokemonEnemigo4).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
 actualizarPokemon(Mipokemon,MiPokemonFinal):-
-pokemonesJugador(Pokemones),
-actualizarEstadoDePokemon(MiPokemonFinal,MiPokemonActualizado ),
-
-
-nth0(IndiceResultado,Pokemones,MiPokemon),
-reemplazarenIndice(Pokemones, IndiceResultado, MiPokemonActualizado, NuevaLista),
-retractall(pokemonesJugador(_)),
-assert(pokemonesJugador(NuevaLista)).
+	pokemonesJugador(Pokemones),
+	actualizarEstadoDePokemon(MiPokemonFinal,MiPokemonActualizado ),
+	nth0(IndiceResultado,Pokemones,Mipokemon),
+	reemplazarenIndice(Pokemones, IndiceResultado, MiPokemonActualizado, NuevaLista),
+	retractall(pokemonesJugador(_)),
+	assert(pokemonesJugador(NuevaLista)).
 
 actualizarEstadoDePokemon(Pokemon, PokemonNuevo):-
-	Pokemon=[Nombre,Tipo,Salud,Ataques,Estado,Nivel,Experiencia],
+	Pokemon=[Nombre,Tipo,Salud,Ataques,_,Nivel,Experiencia],
 	Salud=<0,
-	PokemonNuevo=[Nombre,Tipo,0,Ataques,muerto,Nivel,Experiencia].	
+	PokemonNuevo=[Nombre,Tipo,0,Ataques,muerto,Nivel,Experiencia].
 
 
 actualizarEstadoDePokemon(Pokemon, PokemonNuevo):-
-	Pokemon=[Nombre,Tipo,Salud,Ataques,Estado,Nivel,Experiencia],
+	Pokemon=[Nombre,Tipo,Salud,Ataques,_,Nivel,Experiencia],
 	Salud<60,
 	PokemonNuevo=[Nombre,Tipo,Salud,Ataques,critico,Nivel,Experiencia].
 
 actualizarEstadoDePokemon(Pokemon, PokemonNuevo):-
-	Pokemon=[Nombre,Tipo,Salud,Ataques,Estado,Nivel,Experiencia],
+	Pokemon=[Nombre,Tipo,Salud,Ataques,_,Nivel,Experiencia],
 	PokemonNuevo=[Nombre,Tipo,Salud,Ataques,vivo,Nivel,Experiencia].
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -244,79 +333,161 @@ actualizarExperienciaPokemon(Pokemon, PokemonNuevo):-	%si sumatoria de experienc
 	NuevaExperiencia is Experiencia + 35,
 	NuevaExperiencia>=100,
 	NuevoNivel is Nivel+1,
-	PokemonNuevo=[Nombre,Tipo,Salud,Ataques,Estado,NuevoNivel,0].	
+	PokemonNuevo=[Nombre,Tipo,Salud,Ataques,Estado,NuevoNivel,0].
 
 actualizarExperienciaPokemon(Pokemon, PokemonNuevo):- %Si la sumatoria de la experiencia adquirida no es mayor a 100 entra a aqui
 	Pokemon=[Nombre,Tipo,Salud,Ataques,Estado,Nivel,Experiencia],
 	NuevaExperiencia is Experiencia + 35,
-	PokemonNuevo=[Nombre,Tipo,Salud,Ataques,Estado,Nivel,NuevaExperiencia].	
+	PokemonNuevo=[Nombre,Tipo,Salud,Ataques,Estado,Nivel,NuevaExperiencia].
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%		
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-quienGano(PokemonInicial,MiPokemonFinal,PokemonEnemigoFinal):-
- MiPokemonFinal=[NombreMiPokemon,_,SaludFinal|_],
- PokemonEnemigoFinal=[_,_,SaludEnemigoFinal|_],
- SaludFinal > SaludEnemigoFinal,
- actualizarExperienciaPokemon(MiPokemonFinal, MiPokemonFinalActualizado),
- actualizarPokemon(Mipokemon,MiPokemonFinalActualizado),
+quienGano(Mipokemon,MiPokemonFinal,PokemonEnemigoFinal):-    			%Si gano nuestro pokemon
+	 MiPokemonFinal=[NombreMiPokemon,_,SaludFinal|_],
+	 PokemonEnemigoFinal=[_,_,SaludEnemigoFinal|_],
+	 SaludFinal > SaludEnemigoFinal,
+	 actualizarExperienciaPokemon(MiPokemonFinal, MiPokemonFinalActualizado),
+	 actualizarPokemon(Mipokemon,MiPokemonFinalActualizado),
+ 	write("Gano mi Pokemon "), write(NombreMiPokemon),nl, 
+ 	capturarPokemonDePelea(PokemonEnemigoFinal).
 
- write("Gano mi Pokemon "), write(NombreMiPokemon),nl.
+ 	 quienGano(Mipokemon,MiPokemonFinal,PokemonEnemigoFinal):-  						%Si gano el pokemon enemigo
+	 MiPokemonFinal=[_,_,SaludFinal|_],
+	 PokemonEnemigoFinal=[NombrePokemonEnemigo,_,SaludEnemigoFinal|_],
+	 SaludFinal < SaludEnemigoFinal,
+	  actualizarPokemon(Mipokemon,MiPokemonFinal),
+	 write("Gano el pokemon enemigo, sigue entrenando a tu Pokemon "), write(NombrePokemonEnemigo),nl.
+ 	
+ capturarPokemonDePelea(PokemonACapturar):-
+    pokebolasJugador(HayPokebolas),
+ 	length(HayPokebolas, LongitudPokebolas),
+ 	LongitudPokebolas > 0,
+ 	PokemonACapturar=[NombrePokEne,_,_|_],
+ 	write("Has vencido al pokemon: "), write(NombrePokEne), write(" deseas capturarlo: (si/no)"), nl,
+	read(Respuesta),
+	respuestaCapturarPokemon(Respuesta,PokemonACapturar).
 
- quienGano(_,MiPokemonFinal,PokemonEnemigoFinal):-
- MiPokemonFinal=[_,_,SaludFinal|_],
- PokemonEnemigoFinal=[NombrePokemonEnemigo,_,SaludEnemigoFinal|_],
- SaludFinal < SaludEnemigoFinal,
-  actualizarPokemon(Mipokemon,MiPokemonFinal),
+capturarPokemonDePelea(_):-
+    write("No tienes Pokebolas. Lo siento").
 
- write("Gano el pokemon enemigo, sigue entrenando a tu Pokemon"), write(NombrePokemonEnemigo),nl.
-
- quienGano(_,MiPokemonFinal,PokemonEnemigoFinal).
+respuestaCapturarPokemon(no,PokemonACapturar):-
+	PokemonACapturar=[NombrePokEne,_,_|_],
+	write("Has dejado a "), write(NombrePokEne),nl. 
 
 
-respuestaSobrePelea(si,PokemonEnemigo, NombreEnemigo):-respuestaSobrePelea(si,PokemonEnemigo, NombreEnemigo).
+respuestaCapturarPokemon(si,PokemonACapturar):-
+	write("Lista de pokebolas"),nl,nl,
+	pokebolasJugador(PokebolasJ),
+	impresionListaNumerada(PokebolasJ),nl,
+	read(IndesP),
+	nth0(IndesP, PokebolasJ, PokebolaElegida), 
+	tirarPokebola(PokebolaElegida,PokemonACapturar).
 
-sacarPokemonRandom(Pokemon):-
- 	pokemones(PokemonPeleador),
-	length(PokemonPeleador, LongitudPokemonesP),
-	random(0,LongitudPokemonesP, Random),
-	sacarElementoDeLista(Random,PokemonPeleador,Pokemon).
+	
+respuestaCapturarPokemon(si,PokemonACapturar):-
+	write("Valor invalido vuelve a intentarlo"),nl,
+	respuestaCapturarPokemon(si,PokemonACapturar).
 
-respuestaSobrePelea(Respuesta):-
+tirarPokebola(PokebolaElegida,PokemonACapturar):-
+	random(1,101,NumeroAzar),
+	PokebolaElegida=[_,_,ProPokebola],
+	NumeroAzar < ProPokebola,   %el numero al azar debe ser menor a la probabilidad de  la pokebola
+	pokebolasJugador(PokebolasActuales),
+	agregarPokemonALaMochila(PokemonACapturar,PokebolaElegida),
+	eliminarElemento(PokebolaElegida,PokebolasActuales,ListaSinElemento),
+	retractall(pokebolasJugador(PokebolasActuales)),
+	assert(pokebolasJugador(ListaSinElemento)).
+
+
+tirarPokebola(PokebolaElegida,_):-		%Se eliminara la poquebola aque no se capture el pokemon
+	pokebolasJugador(PokebolasActuales),
+	eliminarElemento(PokebolaElegida,PokebolasActuales,ListaSinElemento),
+	retractall(pokebolasJugador(PokebolasActuales)),
+	assert(pokebolasJugador(ListaSinElemento)),
+	write("No se ha capturado el pokemon"), nl.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+agregarPokemonALaMochila(NuevoPokemon,_):-
+	hayEspacio,
+	pokemonesJugador(Pokemones),
+	append(Pokemones,[NuevoPokemon],NuevaLista),
+	retractall(pokemonesJugador(Pokemones)),
+	assert(pokemonesJugador(NuevaLista)),
+	write("Se agrego exitosamente el pokemon a la mochila"),nl.
+
+agregarPokemonALaMochila(NuevoPokemon,PokebolaElegida):-
+	preguntarGuardadoPokemon(Respuesta), % Preguntar 
+    posibilidadConPokemon(Respuesta,NuevoPokemon,PokebolaElegida).
+
+preguntarGuardadoPokemon(Respuesta):-
+	write("¿Quieres sacar un pokemon para guardar el nuevo? (si/no)"),nl,
 	read(Respuesta),
 	estaDentro(Respuesta,[si,no]).
-
-respuestaSobrePelea(Respuesta):-
+preguntarGuardadoPokemon(Respuesta):-
 	write("No es valida esa respuesta"),nl,
-	respuestaSobrePelea(Respuesta).
+	preguntarGuardadoPokemon(Respuesta).
+
+posibilidadConPokemon(si,Pokemon,Pokebola):-
+    preguntarQuePokemonVasaSacar(Indice),
+   	mandarPokemonABill(Indice),
+	agregarPokemonALaMochila(Pokemon,Pokebola).
+
+posibilidadConPokemon(no,Pokemon,_):-
+	pokemonesconBill(PokemonesBill),
+	retractall(pokemonesconBill(_)),
+	assert(pokemonesconBill([Pokemon|PokemonesBill])),
+   	write("Mandaste el pokemon a bill"),nl.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%&&&&&&&&&&&&&&&&&&&&&&&&&&&
+%%%%%%%%%%%%%%%%%%%%%%%%%%%                       hay espacio                 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+hayEspacio:-
+	pokemonesJugador(PokemonesJugador),
+	huevosJugador(HuevosJugador),
+	length(HuevosJugador,LongitudHuevos),
+	length(PokemonesJugador,LongitudPokemones),
+	Suma is LongitudHuevos + LongitudPokemones,
+	Suma <6.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%&&&&&&&&&&&&&&&&&&&&&&&&&&&
+%%%%%%%%%%%%%%%%%%%%%%%%%%%           Sacar Elemento de la de una lista       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 sacarElementoDeLista(Indice,Lista,Elemento):-sacarElementoDeLista(Indice,0,Lista,Elemento).
 
 sacarElementoDeLista(Indice,Contador,Lista,Elemento):-
-	Lista = [Cabeza|Cola],
+	Lista = [Cabeza|_],
 	Indice=Contador,
 	Elemento=Cabeza.
-	
+
 sacarElementoDeLista(Indice,Contador,Lista,Elemento):-
-	Lista = [Cabeza|Cola],
+	Lista = [_|Cola],
 	Indice\=Contador,
 	NuevoContador is Contador+1,
 	sacarElementoDeLista(Indice,NuevoContador,Cola,Elemento).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%&&&&&&&&&&&&&&&&&&&&&&&&&&&
+%%%%%%%%%%%%%%%%%%%%%%%%%%%            	     Lista numerada                   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 impresionListaNumerada([],_).
 
 impresionListaNumerada([Cabeza|Cola],Contador):-
     write(Contador), write(" = "), write(Cabeza),nl,
-    NuevoContador is Contador+1, 
+    NuevoContador is Contador+1,
 	impresionListaNumerada(Cola, NuevoContador).
-	%Indice=Contador.
 
 impresionListaNumerada(Lista):-impresionListaNumerada(Lista,0).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%&&&&&&&&&&&&&&&&&&&&&&&&&&&
+%%%%%%%%%%%%%%%%%%%%%%%%%%%           Agregar una pokebola a la mochila 	  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 agregarPokebolaALaMochila(NuevaPokebola):-
    pokebolasJugador(Pokebolas),
    retractall(pokebolasJugador(Pokebolas)),
    assert(pokebolasJugador([NuevaPokebola|Pokebolas])),
    write("Se agrego exitosamente la pokebola a la mochila"),nl.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
 agregarHuevoALaMochila(NuevoHuevo):-
 	huevosJugador(Huevos),
@@ -337,22 +508,22 @@ preguntarCiudad(CiudadParaIr):-
 	write("No es valida esa ciudad"),nl,
 	preguntarCiudad(CiudadParaIr).
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%&&&&&&&&&&&&&&&&&&&&&&&&&&&
+%%%%%%%%%%%%%%%%%%%%%%%%%%%                       Estas dentro           	  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %Saber si un elemento esta dentro de una lista
-estaDentro(Elemento,[Elemento|Cola]).
-estaDentro(Elemento,[Cabeza|Cola]):-
+estaDentro(Elemento,[Elemento|_]).
+
+estaDentro(Elemento,[_|Cola]):-
 	estaDentro(Elemento,Cola).
 
-%Hacer una regla que sea verdadera. 
-hayEspacio:-
-	pokemonesJugador(PokemonesJugador),
-	huevosJugador(HuevosJugador),
-	length(HuevosJugador,LongitudHuevos),
-	length(PokemonesJugador,LongitudPokemones),
-	Suma is LongitudHuevos + LongitudPokemones,
-	Suma <7.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+
 
 preguntarGuardadoHuevos(Respuesta):-
-	write("Te guardo el huevo en la Mochila? o se enviara a Bill (si/no)"),nl,
+	write("Te guardo el huevo en la Mochila? (si/no)"),nl,
 	read(Respuesta),
 	estaDentro(Respuesta,[si,no]).
 preguntarGuardadoHuevos(Respuesta):-
@@ -362,10 +533,9 @@ preguntarGuardadoHuevos(Respuesta):-
 preguntarQuePokemonVasaSacar(Respuesta):-
      write("¿Que pokemon vas a mandar a Bill? Pon un indice"),nl,
      pokemonesJugador(Pokemones),
-     length(Pokemones,LongitudPokemones),
      impresionListaNumerada(Pokemones),nl,
 	 read(Respuesta).
-	
+
 mandarPokemonABill(Indice):-
   	pokemonesJugador(ListaPokemonesJugador),
   	pokemonesconBill(ListaPokemonesconBill),
@@ -384,7 +554,7 @@ eliminarElemento(_,[],ListaSinElemento,ListaSinElemento).
 eliminarElemento(Elemento, [Elemento|Cola] ,ListaSinElemento,Resultado):-
 	eliminarElemento(Elemento,Cola,ListaSinElemento,Resultado).
 eliminarElemento(Elemento, [ElementoDistinto|Cola] ,ListaSinElemento,Resultado):-
-	eliminarElemento(Elemento,Cola,[ElementoDistinto|ListaSinElemento],Resultado).	
+	eliminarElemento(Elemento,Cola,[ElementoDistinto|ListaSinElemento],Resultado).
 
 /*eliminarElemento(Elemento,Lista,ListaSinElemento):-eliminarElemento(Elemento,Lista,[],ListaSinElemento).
 eliminarElemento(_,[],ListaSinElemento,ListaSinElemento):-write("igualando acumulador a la variable resultado.").
@@ -394,7 +564,6 @@ eliminarElemento(Elemento, [Elemento|Cola] ,ListaSinElemento,Resultado):-
 eliminarElemento(Elemento, [ElementoDistinto|Cola] ,ListaSinElemento,Resultado):-
 	write(Elemento), write(" no es igual al a la cabeza: "),write(ElementoDistinto),write(" si se agrega a la lista"),nl,
 	eliminarElemento(Elemento,Cola,[ElementoDistinto|ListaSinElemento],Resultado).	*/
-
 
 %BATALLAS ¿QUIERES SER UN MAESTRO POKEMON?
 actualizarEstadoDePelea(Pokemon1,Pokemon2):-
@@ -407,23 +576,21 @@ ponganseaPelear(MiPokemon, PokemonEnemigo):-
 	MiPokemon=[_,_,_,_,_,Nivel|_],
 	bajarPokemon(Ataque,PokemonEnemigo,Nivel,PokemonEnemigoAct),
 	actualizarEstadoDePelea(MiPokemon,PokemonEnemigoAct),
-	ataqueRandomEnemigo(PokemonEnemigo,AtaqueEnemigo),
 	PokemonEnemigo=[_,_,_,_,_,NivelEnemigo|_],
 	PokemonEnemigoAct=[_,_,Salud|_],
 	Salud >0,
-
+	ataqueRandomEnemigo(PokemonEnemigo,AtaqueEnemigo),
 	bajarPokemon(AtaqueEnemigo,MiPokemon,NivelEnemigo,MiPokemonActualizado),
 	actualizarEstadoDePelea(MiPokemonActualizado,PokemonEnemigoAct),
 	MiPokemonActualizado=[_,_,Saludmipokemon|_],
 	Saludmipokemon >0.
 
 ataqueRandomEnemigo(PokemonEnemigo, Ataque):-
-
 PokemonEnemigo=[_,_,_,Ataques|_],
 length(Ataques, LongitudAtaques),
 random(0,LongitudAtaques, RandomIndice),
 sacarElementoDeLista(RandomIndice,Ataques,Ataque),
-write("El enemigo escogio el Ataque: "), write(Ataque),nl.  
+write("El enemigo escogio el Ataque: "), write(Ataque),nl.
 
 elegirAtaque(TuPokemon,Ataque):-
  write("Tienes estos ataques: "),nl,
@@ -432,7 +599,8 @@ elegirAtaque(TuPokemon,Ataque):-
  read(Respuesta),
  sacarElementoDeLista(Respuesta,Ataques,Ataque).
 
- elegirAtaque(TuPokemon,Ataque):- elegirAtaque(TuPokemon,Ataque).
+% Si se descomenta esta linea va a causar problemas con el metodo ponganseaPelear
+ % elegirAtaque(TuPokemon,Ataque):- elegirAtaque(TuPokemon,Ataque).
 
  bajarPokemon(Ataque,PokemonEnemigo, Nivel,PokemonEnemigoActualizado):-
  	PokemonEnemigo=[Nombre,Tipo,Salud|Cola],
@@ -445,3 +613,31 @@ elegirAtaque(TuPokemon,Ataque):-
 reemplazarenIndice([_|T],0,E,[E|T]).
 reemplazarenIndice([H|T],P,E,[H|R]) :-
     P > 0, NP is P-1, reemplazarenIndice(T,NP,E,R).
+
+
+%%Ir al Hospital a Curar los Pokemones.
+curarPokemones:-
+	pokemonesJugador(PokemonesActuales),
+	recorreyCuraPokemones(PokemonesActuales,PokemonesCurados),
+	retractall(pokemonesJugador(PokemonesActuales)),
+	assert(pokemonesJugador(PokemonesCurados)),
+	write("Se han curado tus pokemones satisfactoriamente.").
+
+recorreyCuraPokemones(PokemonesActuales,[NuevoPokemon|PokemonesCurados]):-
+ PokemonesActuales=[[Nombre,Tipo,_,Ataques,_|Cola]|PokemonesRestantes],
+ NuevoPokemon=[Nombre,Tipo,100,Ataques,vivo|Cola],
+ recorreyCuraPokemones(PokemonesRestantes,PokemonesCurados).
+
+
+ recorreyCuraPokemones([],[]).
+
+
+%% [1|PROMESA1],
+%% PROME1 = [2|PROMESA2]= [2|[3]]
+%% PREMESA2 = [3|PROMESA3] = [3].
+%% PROMESA3 =[]
+	
+%% [3|[]] = [3]
+%% [2|[3]] = [2,3].
+%% [1|[2,3]]= [1,2,3]
+
