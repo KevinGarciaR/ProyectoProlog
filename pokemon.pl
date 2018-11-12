@@ -43,13 +43,13 @@ assert(pokebolasJugador([
 %Lista con los Huevos  con los que cueta el jugador
 assert(huevosJugador([
 			   [electrico,80],												
-			   [electrico,80],
 			   [fuego,100],
-			   [electrico,80]
-			 ])), 
+			   [electrico,70],
+			   [fuego,90]
+			 		])), 
 %Lista con los Pokemones con los que cuenta el jugador
 assert(pokemonesJugador([[pikachu,  electrico,60,[ impactrueno,   cabezazo,	tacleada,	chispa],    muerto, 1, 0],
-				  [voltorb,  electrico,10,[ agilidad,      destello,    impactrueno,chispa],	muerto, 1, 0]])),
+				  		 [voltorb,  electrico,10,[ agilidad,      destello,    impactrueno,chispa],	muerto, 1, 0]])),
 
 %Lista con los objetos que se envian a Bill
 assert(pokemonesconBill([])),
@@ -231,12 +231,24 @@ juegoPokemon:-
 
   write("Has llegado a la ciudad "),write(CiudadDestino),write(", que deseas hacer: "),nl,
   distancia2(CiudadActual,CiudadDestino,Distancia),
+  huevoEvolucionPrincipal(Distancia),
   opcionesDeCiudad.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
-huevoEvolucionPricipal():-
-write("").
+huevoEvolucionPrincipal(Distancia):-
+	huevosJugador(HuevosJugador),
+	huevoEvolucionPricipal(Distancia,HuevosJugador).
+
+
+huevoEvolucionPricipal(Distancia,HuevosJugador):-
+	HuevosJugador=[Cabeza|Cola],
+	huevoEvolucionar(Distancia,Cabeza),
+
+	huevoEvolucionPricipal(Distancia,Cola).
+
+huevoEvolucionPricipal(Distancia,Cola):-
+	Colar=[].	
 
 
 huevoEvolucionar(Distancia,Huevo):-	%Pokemon que ha (eclosionado) 
@@ -246,17 +258,21 @@ huevoEvolucionar(Distancia,Huevo):-	%Pokemon que ha (eclosionado)
 	huevoEvolucionadoFinal(Huevo,PokemonEvolucionado),
 	
 	huevosJugador(HuevosJugador),
-	pokemonesJugador(PokemonesJugador),
-	NListaPokemones=[PokemonEvolucionado|PokemonesJugador],
-	retractall(pokemonesJugador(_)),
-	assert(pokemonesJugador(NListaPokemones)),
 
 	eliminarElemento(Huevo,HuevosJugador,NlistaHuevos),
 	retractall(huevosJugador(_)),
-	assert(huevosJugador(NlistaHuevos)).
-	
-	
+	assert(huevosJugador(NlistaHuevos)),
 
+	pokemonesJugador(PokemonesJugador),
+	agregarPokemonALaMochila(PokemonEvolucionado,_).
+
+%	NListaPokemones=[PokemonEvolucionado|PokemonesJugador],
+%	retractall(pokemonesJugador(_)),
+%	assert(pokemonesJugador(NListaPokemones)),
+
+
+	
+	
 huevoEvolucionar(Distancia,Huevo):-   %Huevo que no ha eclosionado
 	Huevo=[N,DEvolucion],
 	NuevaDistancia is DEvolucion-Distancia,
@@ -298,7 +314,7 @@ posibilidadAlCaminar(1):-
 
 %Encontro un huevo en el trayecto
 posibilidadAlCaminar(2):-
-	encontrarHuevo(_).
+	encontrarHuevo.
 
 posibilidadAlCaminar(3):-
 	sacarPokemonRandom(Pokemon),
@@ -369,11 +385,14 @@ opcionesDeCiudadRespuesta(3):-
 	
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%&&&&&&&&&&&&&&&&&&&&&&&&&&&
 %%%%%%%%%%%%%%%%%%%%%%%%%%%              Encotrar huevo      				  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-encontrarHuevo(Huevo):-
+encontrarHuevo:-
 	huevos(Huevos), %unificacion las lista de huevos a la variable
 	length(Huevos,Longitud),
 	random(0,Longitud, Random),
 	sacarElementoDeLista(Random,Huevos,Huevo),
+	encontrarHuevo(Huevo).
+
+encontrarHuevo(Huevo):-
 	Huevo=[Cabeza|_],
 	write("Has encontrado un Huevo en tu trayecto, de tipo: "), write(Cabeza),nl,
 	hayEspacio,
@@ -792,7 +811,7 @@ checarPokemonesVivos.
 
 recorreyChecaPokemonesMuertos([PokemonesActuales|Cola]):-
  PokemonesActuales=[_,_,Salud|_],
- Salud<=0,
+ Salud=<0,
  recorreyChecaPokemonesMuertos(Cola).
 
 recorreyChecaPokemonesMuertos([]).
