@@ -11,11 +11,16 @@ Integrantes:
 	pokemonesJugador/1,
 	pokemonesPeleando/2,
 	pokemonesconBill/1,
-	dineroJugador/1.
+	dineroJugador/1,
+	ciudadActual/1,
+	ciudadDestino/1.
 
 %Nombre, costo, probabilidad de atrapar el Pokemon
 pokebolas([[normal,30,40],[azul,60,60],[negra,100,90]]).
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%                 Estado del Juego                 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 inicializarVariables:-
 % Borrar información del Estado
 retractall(pokebolasJugador(_)),
@@ -24,8 +29,10 @@ retractall(pokemonesJugador(_)),
 retractall(pokemonesPeleando(_)),
 retractall(pokemonesconBill(_)),
 retractall(dineroJugador(_)),
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%                 Estado del Juego                 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+retractall(ciudadActual(_)),
+retractall(ciudadDestino(_)),
+
+
 %Lista con las pokebola que cuenta el Jugador
 assert(pokebolasJugador([
 				 [normal,30,40],
@@ -45,9 +52,10 @@ assert(pokemonesJugador([[pikachu,  electrico,60,[ impactrueno,   cabezazo,	tacl
 %Lista con los objetos que se envian a Bill
 assert(pokemonesconBill([])),
 %Saldo del jugador
-assert(dineroJugador(1000)).
+assert(dineroJugador(1000)),
+assert(ciudadActual(culiacan)).
 
-% Fin del Estado del Juego
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Tipo, distancia para nacer
 huevos([[electrico,80],[agua,60],[fuego,90],[normal,30],[tierra,50]]).
@@ -153,6 +161,18 @@ distancia2(Ciudad1,Ciudad2,Distancia):-
 distancia(Ciudad1,Ciudad2,Distancia).
 distancia2(Ciudad1,Ciudad2,Distancia):-
  distancia(Ciudad2,Ciudad1,Distancia).
+
+
+ mostrarOpcionesDeViaje(Origen):-  
+	 write("Destinos: "),nl,	 
+	 distancia2(Origen,X,_),	 
+	 tab(1),write(X),nl,
+	 false.
+
+ mostrarOpcionesDeViaje(_):- 
+     true.
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%                    implementada de tienda         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -201,10 +221,11 @@ juegoPokemon:-
   %llegasASiguienteCiudad.
 
 caminarASiguienteCiudad:-
-  %preguntarCiudad(CiudadParaIr),
+  preguntarCiudad(CiudadParaIr),
   random(1,4, Random),
-  posibilidadAlCaminar(Random).
-  %cambiarCiudad(CiudadParaIr).
+  posibilidadAlCaminar(Random),
+  write("Has llegado a la ciudad "),write(CiudadParaIr),write(", que deseas hacer: "),nl,
+  opcionesDeCiudad.
 
 %Encontro pokebola en el trayecto
 posibilidadAlCaminar(1):-
@@ -225,7 +246,39 @@ posibilidadAlCaminar(3):-
 	write("Has encontrado al pokemon: "), write(Cabeza), write(" deseas pelear con el? (si/no)"), nl,
 	read(Respuesta),
 	respuestaSobrePelea(Respuesta,Pokemon, Cabeza).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%&&&&&&&&&&&&&&&&&&&&&&&&&&&
+%%%%%%%%%%%%%%%%%%%%%%%%%%%              Opciones de Ciudad     		      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+
+opcionesDeCiudad:-
+	write("0 = Ir a la tienda"),nl,
+	write("1 = Ir a enfermeria"),nl,
+	write("2 = Ir al gimnasio"),nl,
+	write("3 = Ir a la siguiente ciudad"), nl,nl,
+	read(Respuesta),
+	opcionesDeCiudadRespuesta(Respuesta).
+
+opcionesDeCiudad:-
+	write("Respuesta invalida vuelve a intentarlo"),nl,
+	opcionesDeCiudad.	
+
+opcionesDeCiudadRespuesta(0):-
+	tienda,
+	opcionesDeCiudad.
+			
+opcionesDeCiudadRespuesta(1):-
+	curarPokemones,
+	opcionesDeCiudad.
+
+opcionesDeCiudadRespuesta(2):-
+
+
+	write("").	
+opcionesDeCiudadRespuesta(3):-
+	 caminarASiguienteCiudad.	
+
+	
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%&&&&&&&&&&&&&&&&&&&&&&&&&&&
 %%%%%%%%%%%%%%%%%%%%%%%%%%%              Encotrar huevo      				  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 encontrarHuevo(Huevo):-
@@ -496,13 +549,16 @@ agregarHuevoALaMochila(NuevoHuevo):-
 	write("Se agrego exitosamente el huevo a la mochila"),nl.
 
 preguntarCiudad(CiudadParaIr):-
-	write("Elige una ciudad para ir:"),nl,
+	ciudadActual(CiudadActual),
+	mostrarOpcionesDeViaje(CiudadActual), 
 	ciudades(X),
-	write(X),nl,
 	read(CiudadParaIr),
-	estaDentro(CiudadParaIr,X),
+	estaDentro(CiudadParaIr,X),nl,
 	write("Has escogido :"),
-	write(CiudadParaIr),nl.
+	write(CiudadParaIr),nl,
+	retractall(ciudadDestino(_)),
+	assert(ciudadDestino(CiudadParaIr)).
+
 
 preguntarCiudad(CiudadParaIr):-
 	write("No es valida esa ciudad"),nl,
