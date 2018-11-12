@@ -507,6 +507,7 @@ agregarPokemonALaMochila(NuevoPokemon,_):-
 	append(Pokemones,[NuevoPokemon],NuevaLista),
 	retractall(pokemonesJugador(Pokemones)),
 	assert(pokemonesJugador(NuevaLista)),
+	checarPokemonDeCadaTipo,
 	write("Se agrego exitosamente el pokemon a la mochila"),nl.
 
 agregarPokemonALaMochila(NuevoPokemon,PokebolaElegida):-
@@ -729,17 +730,39 @@ recorreyCuraPokemones(PokemonesActuales,[NuevoPokemon|PokemonesCurados]):-
 checarPokemonesVivos:-
 	pokemonesJugador(PokemonesActuales),
 	recorreyChecaPokemonesMuertos(PokemonesActuales),
-	write("Todos tus pokemones estan muertos, por lo que el Juego se termino"),
+	write("Todos tus pokemones estan muertos, por lo que el Juego se termino"),nl,
 	abort.
 
 checarPokemonesVivos.
 
-recorreyChecaPokemonesMuertos([PokemonesActuales|Cola]):-
- PokemonesActuales=[_,_,Salud|_],
- Salud<=0,
+recorreyChecaPokemonesMuertos([Pokemon|Cola]):-
+ Pokemon=[_,_,Salud|_],
+ Salud=<0,
  recorreyChecaPokemonesMuertos(Cola).
 
 recorreyChecaPokemonesMuertos([]).
+
+
+checarPokemonDeCadaTipo:-
+	pokemonesJugador(PokemonesActuales),
+	pokemonesconBill(PokemonesConBill),
+	append(PokemonesActuales,PokemonesConBill,ListaNuevaConTodosLosPokemones),
+	recorreyChecaPokemonDeCadaTipo(ListaNuevaConTodosLosPokemones,[agua,tierra,fuego,electrico,normal]),
+	write("Felicidades, tienes un Pokemon de cada tipo. GANASTE"),nl,
+	abort.
+
+checarPokemonDeCadaTipo.
+
+recorreyChecaPokemonDeCadaTipo([Pokemon|Cola],ListaConTipos):-
+ Pokemon=[_,Tipo|_],
+ member(Tipo,ListaConTipos),
+ eliminarElemento(Tipo,ListaConTipos,ListaSinElemento),
+ recorreyChecaPokemonDeCadaTipo(Cola,ListaSinElemento).
+
+recorreyChecaPokemonDeCadaTipo([Pokemon|Cola],ListaConTipos):-
+	recorreyChecaPokemonDeCadaTipo(Cola,ListaConTipos).
+
+recorreyChecaPokemonDeCadaTipo(_,[]).
 
 
 
