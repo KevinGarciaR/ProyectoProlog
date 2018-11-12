@@ -386,12 +386,23 @@ actualizarExperienciaPokemon(Pokemon, PokemonNuevo):-	%si sumatoria de experienc
 	NuevaExperiencia is Experiencia + 35,
 	NuevaExperiencia>=100,
 	NuevoNivel is Nivel+1,
+	checarEvolucion(Pokemon, NuevoNivel, PokemonNuevo),
 	PokemonNuevo=[Nombre,Tipo,Salud,Ataques,Estado,NuevoNivel,0].
 
 actualizarExperienciaPokemon(Pokemon, PokemonNuevo):- %Si la sumatoria de la experiencia adquirida no es mayor a 100 entra a aqui
 	Pokemon=[Nombre,Tipo,Salud,Ataques,Estado,Nivel,Experiencia],
 	NuevaExperiencia is Experiencia + 35,
 	PokemonNuevo=[Nombre,Tipo,Salud,Ataques,Estado,Nivel,NuevaExperiencia].
+
+
+checarEvolucion(Pokemon,NivelNuevo,PokemonNuevo):-
+	Pokemon=[Nombre,Tipo,Salud,Ataques,Estado,Nivel,Experiencia],
+	evolucion(Nombre, NombrePokemonEvolucionado,NivelNuevo),
+	PokemonNuevo= [NombrePokemonEvolucionado,Tipo,100,Ataques,vivo,Nivel,0],
+	write("Tu Pokemon "), write(Nombre), write(" ha evolucionado a "), write(NombrePokemonEvolucionado).
+
+
+	checarEvolucion(Pokemon,NivelNuevo,Pokemon).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
