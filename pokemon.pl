@@ -13,7 +13,8 @@ Integrantes:
 	pokemonesconBill/1,
 	dineroJugador/1,
 	ciudadActual/1,
-	ciudadDestino/1.
+	ciudadDestino/1,
+	medallasJugador/1.
 
 %Nombre, costo, probabilidad de atrapar el Pokemon
 pokebolas([[normal,30,40],[azul,60,60],[negra,100,90]]).
@@ -156,6 +157,9 @@ distancia(monterrey,tepic,30).
 distancia(monterrey,puebla,50).
 distancia(tepic,puebla,30).
 
+%Nombres de Entrenadores
+entrenadores(["Lowel", "Kevin", "Ivan", "Daniel", "Efrain", "Jose Carlos", "Jose Luis","John Cena", "Gabriel", "Ana", "Priscila", "Kenia", "Misty", "Ash"]).
+
 % invertir distancias
 distancia2(Ciudad1,Ciudad2,Distancia):-
 distancia(Ciudad1,Ciudad2,Distancia).
@@ -178,7 +182,7 @@ distancia2(Ciudad1,Ciudad2,Distancia):-
 
  tienda:-
 	write("******   Lista de objectos que puedes comprar    ******"),nl,nl,
-	write("Num    Objecto      precio"),nl,
+	write("Num    Objeto      precio"),nl,
 	write("0   Pokebola norma     30"),nl,
 	write("1   Pokebola azul      60"),nl,
 	write("2   Pokebola negra     100"),nl,
@@ -222,7 +226,7 @@ juegoPokemon:-
 
 caminarASiguienteCiudad:-
   preguntarCiudad(CiudadParaIr),
-  random(1,4, Random),
+  random(1,5, Random),
   posibilidadAlCaminar(Random),
   write("Has llegado a la ciudad "),write(CiudadParaIr),write(", que deseas hacer: "),nl,
   opcionesDeCiudad.
@@ -246,6 +250,34 @@ posibilidadAlCaminar(3):-
 	write("Has encontrado al pokemon: "), write(Cabeza), write(" deseas pelear con el? (si/no)"), nl,
 	read(Respuesta),
 	respuestaSobrePelea(Respuesta,Pokemon, Cabeza).
+
+	%% posibilidadAlCaminar(4):-
+	%% entrenadores(Entrenadores),
+	%% random_permutation(Entrenadores,EntrenadoresRevueltos),
+	%% EntrenadoresRevueltos=[NombreEntrenador|_],
+	%% write("En tu trayecto te has encontrado al entrenador "),write(NombreEntrenador), write("deseas pelear con el? (si/no)"),
+	%% read(Respuesta),
+	%% respuestaEntrenador(Respuesta,NombreEntrenador).
+
+
+%% 	% Pelear con Entrenador
+%% respuestaEntrenador(no,NombreEntrenador):-
+%% write("No peleaste con el entrenador "), write(NombreEntrenador).
+
+%% respuestaEntrenador(si,NombreEntrenador):-
+%% write("Preparado?"),nl,
+%% write("Necesitas escoger a un Pokemon para enfrentar a "), write(NombreEntrenador),nl,
+%%     pokemonesJugador(Pokemones),
+%% 	impresionListaNumerada(Pokemones),nl,
+%% 	read(Indice),
+%% 	sacarElementoDeLista(Indice,Pokemones,TuPokemon),
+%% 	peleaPokemones(TuPokemon, PokemonEnemigo).
+
+%% respuestaEntrenador(_,NombreEntrenador):-
+%% 	write("Esa opcion no es valida"),nl,
+%% 	respuestaEntrenador(_,NombreEntrenador).
+
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%&&&&&&&&&&&&&&&&&&&&&&&&&&&
 %%%%%%%%%%%%%%%%%%%%%%%%%%%              Opciones de Ciudad     		      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -311,15 +343,8 @@ sacarPokemonRandom(Pokemon):-
  	random(0,LongitudPokemonesP, Random),
  	sacarElementoDeLista(Random,PokemonPeleador,Pokemon).
 
-respuestaSobrePelea(Respuesta):-
-	read(Respuesta),
-	estaDentro(Respuesta,[si,no]).
+ % Pelear con Pokemon
 
-
-
-respuestaSobrePelea(Respuesta):-
-	write("No es valida esa respuesta"),nl,
-	respuestaSobrePelea(Respuesta).
 
 respuestaSobrePelea(no,_,_):-
 write("Te perdiste de un gran Pokemon :(").
@@ -334,6 +359,7 @@ write("Necesitas escoger a un Pokemon para enfrentar a "), write(NombreEnemigo),
 	peleaPokemones(TuPokemon, PokemonEnemigo).
 
 respuestaSobrePelea(si,PokemonEnemigo, NombreEnemigo):-respuestaSobrePelea(si,PokemonEnemigo, NombreEnemigo).
+
 
 
 peleaPokemones(Mipokemon,Pokemonenemigo):-
@@ -420,7 +446,8 @@ quienGano(Mipokemon,MiPokemonFinal,PokemonEnemigoFinal):-    			%Si gano nuestro
 	 PokemonEnemigoFinal=[NombrePokemonEnemigo,_,SaludEnemigoFinal|_],
 	 SaludFinal < SaludEnemigoFinal,
 	  actualizarPokemon(Mipokemon,MiPokemonFinal),
-	 write("Gano el pokemon enemigo, sigue entrenando a tu Pokemon "), write(NombrePokemonEnemigo),nl.
+	 write("Gano el pokemon enemigo, sigue entrenando a tu Pokemon "), write(NombrePokemonEnemigo),nl,
+	 checarPokemonesVivos.
  	
  capturarPokemonDePelea(PokemonACapturar):-
     pokebolasJugador(HayPokebolas),
@@ -697,6 +724,25 @@ recorreyCuraPokemones(PokemonesActuales,[NuevoPokemon|PokemonesCurados]):-
 
 
  recorreyCuraPokemones([],[]).
+
+%Checar Pokemones Vivos
+checarPokemonesVivos:-
+	pokemonesJugador(PokemonesActuales),
+	recorreyChecaPokemonesMuertos(PokemonesActuales),
+	write("Todos tus pokemones estan muertos, por lo que el Juego se termino"),
+	abort.
+
+checarPokemonesVivos.
+
+recorreyChecaPokemonesMuertos([PokemonesActuales|Cola]):-
+ PokemonesActuales=[_,_,Salud|_],
+ Salud<=0,
+ recorreyChecaPokemonesMuertos(Cola).
+
+recorreyChecaPokemonesMuertos([]).
+
+
+
 
 
 %% [1|PROMESA1],
