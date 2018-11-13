@@ -358,7 +358,7 @@ huevoEvolucionPricipal(_,[]).
 huevoEvolucionar(Distancia,Huevo):-	%Pokemon que ha (eclosionado)
 	Huevo=[Tipo,DEvolucion],
 	Distancia>=DEvolucion,
-	write("Feliciadades un huevo de tipo "),write(Tipo), write(", ha eclosionado"),nl,
+	write("Felicidades un huevo de tipo "),write(Tipo), write(", ha eclosionado"),nl,
 	huevoEvolucionadoFinal(Huevo,PokemonEvolucionado),
 
 	huevosJugador(HuevosJugador),
@@ -400,14 +400,12 @@ caminarASiguienteCiudad:-
 
 %Encontro pokebola en el trayecto
 posibilidadAlCaminar(1):-
+	write("Has encontrado una pokebola en tu trayecto."),nl,
 	pokebolas(Pokebolas), 							%unificacion las lista de pokebolas a la variable
 	length(Pokebolas,Longitud),
 	random(0,Longitud, Random),
 	sacarElementoDeLista(Random,Pokebolas,Pokebola),
-	agregarPokebolaALaMochila(Pokebola),
-	Pokebola=[NombrePokebola|_],
-	write("Has encontrado una pokebola en tu trayecto de tipo: "), write(NombrePokebola),nl.
-	
+	agregarPokebolaALaMochila(Pokebola).
 
 %Encontro un huevo en el trayecto
 posibilidadAlCaminar(2):-
@@ -560,6 +558,7 @@ opcionesDeCiudadRespuesta(7):-
 	 write("Nombre, costo, probabilidad de atrapar el Pokemon (%)"),nl,nl,
 	 impresionListaNormal(PokebolasActuales),nl,nl,nl,
 	 opcionesDeCiudad.
+
 opcionesDeCiudadRespuesta(8):-
 	 medallasJugador(MedallasActuales),nl,nl,nl,
 	 write("Lista de Medallas que tengo: "),nl,
@@ -685,27 +684,29 @@ actualizarEstadoDePokemon(Pokemon, PokemonNuevo):-
 	PokemonNuevo=[Nombre,Tipo,Salud,Ataques,vivo,Nivel,Experiencia].
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-actualizarExperienciaPokemon(Pokemon, PokemonNuevo):-	%si sumatoria de experiencia supera 100 se aumenta el nivel y exériencia=0
-	Pokemon=[Nombre,Tipo,Salud,Ataques,Estado,Nivel,Experiencia],
-	NuevaExperiencia is Experiencia + 35,
-	NuevaExperiencia>=100,
-	NuevoNivel is Nivel+1,
-	write("Tu Pokemon "), write(Nombre), write(" ha subido de nivel a nivel "), write(NuevoNivel),nl,
-	checarEvolucion(Pokemon, NuevoNivel, NombreEvolucion),
-	PokemonNuevo=[NombreEvolucion,Tipo,Salud,Ataques,Estado,NuevoNivel,0].
 
 actualizarExperienciaPokemon(Pokemon, PokemonNuevo):- %Si la sumatoria de la experiencia adquirida no es mayor a 100 entra a aqui
 	Pokemon=[Nombre,Tipo,Salud,Ataques,Estado,Nivel,Experiencia],
 	NuevaExperiencia is Experiencia + 35,
 	PokemonNuevo=[Nombre,Tipo,Salud,Ataques,Estado,Nivel,NuevaExperiencia].
 
+actualizarExperienciaPokemon(Pokemon, PokemonNuevo):-	%si sumatoria de experiencia supera 100 se aumenta el nivel y exériencia=0
+	Pokemon=[Nombre,Tipo,Salud,Ataques,Estado,Nivel,Experiencia],
+	NuevaExperiencia is Experiencia + 35,
+	NuevaExperiencia>=100,
+	NuevoNivel is Nivel+1,
+	PokemonNuevo=[Nombre,Tipo,Salud,Ataques,Estado,NuevoNivel,0],
+	checarEvolucion(Pokemon, NuevoNivel, PokemonNuevo).
 
-checarEvolucion(Pokemon,NivelNuevo,NombrePokemonEvolucionado):-
-	Pokemon=[Nombre|_],
+
+checarEvolucion(Pokemon,NivelNuevo,PokemonNuevo):-
+	Pokemon=[Nombre,Tipo,_,Ataques,_,Nivel,_],
 	evolucion(Nombre, NombrePokemonEvolucionado,NivelNuevo),
-	write("Tu Pokemon "), write(Nombre), write(" ha evolucionado a "), write(NombrePokemonEvolucionado),nl.
-checarEvolucion(Pokemon,_,Nombre):-
-	Pokemon = [Nombre|_].
+	PokemonNuevo= [NombrePokemonEvolucionado,Tipo,100,Ataques,vivo,Nivel,0],
+	write("Tu Pokemon "), write(Nombre), write(" ha evolucionado a "), write(NombrePokemonEvolucionado).
+
+
+checarEvolucion(Pokemon,_,Pokemon).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -930,7 +931,7 @@ estaDentro(Elemento,[_|Cola]):-
 
 
 preguntarGuardadoHuevos(Respuesta):-
-	write("Te guardo el huevo en la Mochila? (si/no)"),nl,
+	write("El espacio en tu mochila esta lleno. Te guardo el huevo en la Mochila? (si/no)"),nl,
 	read(Respuesta),
 	estaDentro(Respuesta,[si,no]).
 preguntarGuardadoHuevos(Respuesta):-
@@ -979,7 +980,7 @@ assert(pokemonesPeleando(Pokemon1,Pokemon2)).
 
 ponganseaPelear(MiPokemon, PokemonEnemigo):-
 	actualizarEstadoDePelea(MiPokemon,PokemonEnemigo),
-	elegirAtaque(MiPokemon, Ataque),!,
+	elegirAtaque(MiPokemon, Ataque),
 	MiPokemon=[_,_,_,_,_,Nivel|_],
 	bajarPokemon(Ataque,PokemonEnemigo,Nivel,PokemonEnemigoAct),
 	actualizarEstadoDePelea(MiPokemon,PokemonEnemigoAct),
@@ -1006,10 +1007,6 @@ elegirAtaque(TuPokemon,Ataque):-
  read(Respuesta),
  sacarElementoDeLista(Respuesta,Ataques,Ataque).
 
-
-elegirAtaque(TuPokemon,Ataque):-
-write("Ataque invalido, escoge otro porfavor."),
-elegirAtaque(TuPokemon,Ataque).
 % Si se descomenta esta linea va a causar problemas con el metodo ponganseaPelear
  % elegirAtaque(TuPokemon,Ataque):- elegirAtaque(TuPokemon,Ataque).
 
