@@ -327,8 +327,7 @@ tiendaCompraPokebola(Dinero,PrecioPokebola,_):-
 %Inicio del juego
 juegoPokemon:-
   inicializarVariables,
-  caminarASiguienteCiudad,
-  llegasASiguienteCiudad.
+  caminarASiguienteCiudad.
 
  llegasASiguienteCiudad:-
   ciudadActual(CiudadActual),
@@ -359,7 +358,7 @@ huevoEvolucionPricipal(_,[]).
 huevoEvolucionar(Distancia,Huevo):-	%Pokemon que ha (eclosionado)
 	Huevo=[Tipo,DEvolucion],
 	Distancia>=DEvolucion,
-	write("Feliciadades un huevo de tipo "),write(Tipo), write(", ha eclosionado"),nl,
+	write("Felicidades un huevo de tipo "),write(Tipo), write(", ha eclosionado"),nl,
 	huevoEvolucionadoFinal(Huevo,PokemonEvolucionado),
 
 	huevosJugador(HuevosJugador),
@@ -396,7 +395,8 @@ huevoEvolucionadoFinal(Huevo,HuevoEvolucionado):-
 caminarASiguienteCiudad:-
   preguntarCiudad,
   random(1,5, Random),
-  posibilidadAlCaminar(Random).
+  posibilidadAlCaminar(Random),
+  llegasASiguienteCiudad.
 
 %Encontro pokebola en el trayecto
 posibilidadAlCaminar(1):-
@@ -506,7 +506,9 @@ opcionesDeCiudad:-
 	write("4 = Ver mis Pokemones"),nl,
 	write("5 = Ver Pokemones que tiene Bill"),nl,
 	write("6 = Ver Huevos"),nl,
-	write("7 = Ver Mis Pokebolas"),nl,nl,
+	write("7 = Ver Mis Pokebolas"),nl,
+	write("8 = Ver Mis Medallas"),nl,
+	write("9 = Terminar la partida"),nl,nl,
 	read(Respuesta),
 	opcionesDeCiudadRespuesta(Respuesta).
 
@@ -557,6 +559,13 @@ opcionesDeCiudadRespuesta(7):-
 	 impresionListaNormal(PokebolasActuales),nl,nl,nl,
 	 opcionesDeCiudad.
 
+opcionesDeCiudadRespuesta(8):-
+	 medallasJugador(MedallasActuales),nl,nl,nl,
+	 write("Lista de Medallas que tengo: "),nl,
+	 impresionListaNormal(MedallasActuales),nl,nl,nl,
+	 opcionesDeCiudad.
+opcionesDeCiudadRespuesta(9):-
+	 abort.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%&&&&&&&&&&&&&&&&&&&&&&&&&&&
 %%%%%%%%%%%%%%%%%%%%%%%%%%%              Encotrar huevo      				  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 encontrarHuevo:-
@@ -675,18 +684,19 @@ actualizarEstadoDePokemon(Pokemon, PokemonNuevo):-
 	PokemonNuevo=[Nombre,Tipo,Salud,Ataques,vivo,Nivel,Experiencia].
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-actualizarExperienciaPokemon(Pokemon, PokemonNuevo):-	%si sumatoria de experiencia supera 100 se aumenta el nivel y exériencia=0
-	Pokemon=[Nombre,Tipo,Salud,Ataques,Estado,Nivel,Experiencia],
-	NuevaExperiencia is Experiencia + 35,
-	NuevaExperiencia>=100,
-	NuevoNivel is Nivel+1,
-	checarEvolucion(Pokemon, NuevoNivel, PokemonNuevo),
-	PokemonNuevo=[Nombre,Tipo,Salud,Ataques,Estado,NuevoNivel,0].
 
 actualizarExperienciaPokemon(Pokemon, PokemonNuevo):- %Si la sumatoria de la experiencia adquirida no es mayor a 100 entra a aqui
 	Pokemon=[Nombre,Tipo,Salud,Ataques,Estado,Nivel,Experiencia],
 	NuevaExperiencia is Experiencia + 35,
 	PokemonNuevo=[Nombre,Tipo,Salud,Ataques,Estado,Nivel,NuevaExperiencia].
+
+actualizarExperienciaPokemon(Pokemon, PokemonNuevo):-	%si sumatoria de experiencia supera 100 se aumenta el nivel y exériencia=0
+	Pokemon=[Nombre,Tipo,Salud,Ataques,Estado,Nivel,Experiencia],
+	NuevaExperiencia is Experiencia + 35,
+	NuevaExperiencia>=100,
+	NuevoNivel is Nivel+1,
+	PokemonNuevo=[Nombre,Tipo,Salud,Ataques,Estado,NuevoNivel,0],
+	checarEvolucion(Pokemon, NuevoNivel, PokemonNuevo).
 
 
 checarEvolucion(Pokemon,NivelNuevo,PokemonNuevo):-
@@ -746,7 +756,8 @@ actualizarPuntosEntrenador(_).
  	PokemonACapturar=[NombrePokEne,_,_|_],
  	write("Has vencido al pokemon: "), write(NombrePokEne), write(" deseas capturarlo: (si/no)"), nl,
 	read(Respuesta),
-	respuestaCapturarPokemon(Respuesta,PokemonACapturar).
+	actualizarEstadoDePokemon(PokemonACapturar,PokemonACapturarAct),
+	respuestaCapturarPokemon(Respuesta,PokemonACapturarAct).
 
 capturarPokemonDePelea(_):-tipoPelea(entrenador).
 
@@ -920,7 +931,7 @@ estaDentro(Elemento,[_|Cola]):-
 
 
 preguntarGuardadoHuevos(Respuesta):-
-	write("Te guardo el huevo en la Mochila? (si/no)"),nl,
+	write("El espacio en tu mochila esta lleno. Te guardo el huevo en la Mochila? (si/no)"),nl,
 	read(Respuesta),
 	estaDentro(Respuesta,[si,no]).
 preguntarGuardadoHuevos(Respuesta):-
