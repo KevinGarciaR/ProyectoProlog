@@ -49,7 +49,7 @@ assert(pokebolasJugador([
 				 [negra,100,90]
 				])),
 %Lista con los Huevos  con los que cueta el jugador
-assert(huevosJugador([])),
+assert(huevosJugador([])), 
 %Lista con los Pokemones con los que cuenta el jugador
 assert(pokemonesJugador([[pikachu,  electrico,100,[ impactrueno,   cabezazo,	tacleada,	chispa],    vivo, 1, 0]]
 				        )),
@@ -63,7 +63,7 @@ assert(ciudadActual(culiacan)).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Tipo, distancia para nacer
-huevos([[electrico,180],[agua,200],[fuego,140],[normal,120],[tierra,90]]).
+huevos([[electrico,80],[agua,60],[fuego,90],[normal,30],[tierra,50]]).
 
 % pokemones: Nombre,     tipo, salud,                  ataques,                    estado, nivel, experiencia
 pokemones([
@@ -200,15 +200,14 @@ distancia(Ciudad1,Ciudad2,Distancia).
 distancia2(Ciudad1,Ciudad2,Distancia):-
  distancia(Ciudad2,Ciudad1,Distancia).
 
- mostrarOpcionesDeViaje(Origen):-
- 	 ciudadActual(CiudadActual),
-	 write("Actualmente te encuentras en "), write(CiudadActual), write(",tienes los siguientes destinos a partir de aqui: "),nl,
-	 distancia2(Origen,X,_),
-	 Origen\=X,
+ mostrarOpcionesDeViaje(Origen):-  
+	 write("Destinos: "),nl,	  
+	 distancia2(Origen,X,_),	
+	 Origen\=X, 
 	 tab(1),write(X),nl,
 	 false.
 
- mostrarOpcionesDeViaje(_):-
+ mostrarOpcionesDeViaje(_):- 
      true.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -242,7 +241,6 @@ respuestaGimnasio(si,_,PokemonesGimnasio):-
 	peleaGimnasio(PokemonesGimnasio).
 
 peleaGimnasio([PokemonEnemigo|Cola]):-
-	retractall(tipoPelea(_)),
 	assert(tipoPelea(entrenador)),
 	iniciarPelea(PokemonEnemigo),
 	peleaGimnasio(Cola).
@@ -280,7 +278,7 @@ ganarPeleaGimnasio:-
 	write("Ya tienes la medalla "),write(CiudadActual),nl.
 
 perderPeleaGimnasio:-
-	write("Perdiste la pelea, mejor suerte la proxima").
+	write("Perdiste la pelea, mejor suerte la proxima"),nl.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -294,7 +292,7 @@ perderPeleaGimnasio:-
 	write("2   Pokebola negra     100"),nl,
 
 	dineroJugador(Dinero),nl,
-	write("Tu cuentas con un saldo de : "),
+	write("Tu cuentas con un saldo de : "), 
 	write(Dinero),nl,
 	tiendaRespuesta(Dinero).
 
@@ -305,19 +303,19 @@ tiendaRespuesta(Dinero):-
 	nth0(Respuesta,Pokebolas,PokebolaElegida),
 	PokebolaElegida=[_,PrecioPokebola,_],nl,
 	tiendaCompraPokebola(Dinero,PrecioPokebola,PokebolaElegida).
-
-
+	
+	
 tiendaRespuesta(Dinero):-
 	write("ERROR: Opcion incorrecta vuelva a intentarlo"),nl,nl,
 	tiendaRespuesta(Dinero).
 
 tiendaCompraPokebola(Dinero,PrecioPokebola,Pokebola):-
-	Dinero > PrecioPokebola,
+	Dinero > PrecioPokebola,	
 	agregarPokebolaALaMochila(Pokebola),
 	NuevoDinero is Dinero-PrecioPokebola,nl,nl,
 	retractall(dineroJugador(_)),
 	assert(dineroJugador(NuevoDinero)).
-
+	
 tiendaCompraPokebola(Dinero,PrecioPokebola,_):-
 	write(Dinero),write(PrecioPokebola),nl,
 	write("No cuentas con el saldo suficiente, regresa cuando tengas mas dinero"),nl.
@@ -329,7 +327,7 @@ juegoPokemon:-
   inicializarVariables,
   caminarASiguienteCiudad,
   llegasASiguienteCiudad.
-
+ 
  llegasASiguienteCiudad:-
   ciudadActual(CiudadActual),
   ciudadDestino(CiudadDestino),
@@ -337,12 +335,10 @@ juegoPokemon:-
   write("Has llegado a la ciudad "),write(CiudadDestino),write(", que deseas hacer: "),nl,
   distancia2(CiudadActual,CiudadDestino,Distancia),
   huevoEvolucionPrincipal(Distancia),
-  retractall(ciudadActual(_)),
-  assert(ciudadActual(CiudadDestino)),
   opcionesDeCiudad.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+	
 huevoEvolucionPrincipal(Distancia):-
 	huevosJugador(HuevosJugador),
 	huevoEvolucionPricipal(Distancia,HuevosJugador).
@@ -356,12 +352,12 @@ huevoEvolucionPricipal(Distancia,HuevosJugador):-
 huevoEvolucionPricipal(_,[]).
 
 
-huevoEvolucionar(Distancia,Huevo):-	%Pokemon que ha (eclosionado)
+huevoEvolucionar(Distancia,Huevo):-	%Pokemon que ha (eclosionado) 
 	Huevo=[Tipo,DEvolucion],
 	Distancia>=DEvolucion,
-	write("Feliciadades un huevo de tipo "),write(Tipo), write(", ha eclosionado"),nl,
+	write("Feliciadades  un huevo de tipo "),write(Tipo), write(", a eclosionado"),nl,
 	huevoEvolucionadoFinal(Huevo,PokemonEvolucionado),
-
+	
 	huevosJugador(HuevosJugador),
 
 	eliminarElemento(Huevo,HuevosJugador,NlistaHuevos),
@@ -370,6 +366,9 @@ huevoEvolucionar(Distancia,Huevo):-	%Pokemon que ha (eclosionado)
 
 	agregarPokemonALaMochila(PokemonEvolucionado,_).
 
+
+	
+	
 huevoEvolucionar(Distancia,Huevo):-   %Huevo que no ha eclosionado
 	Huevo=[N,DEvolucion],
 	NuevaDistancia is DEvolucion-Distancia,
@@ -385,13 +384,13 @@ huevoEvolucionadoFinal(Huevo,HuevoEvolucionado):-
 	pokemones(Pokemones),
 	random_permutation(Pokemones,PokemonesRevueltos),
 	Huevo=[TipoH,_],
-	member([Nombre,TipoH|Cola],PokemonesRevueltos),
-	HuevoEvolucionado=[Nombre,TipoH|Cola].
+	member([Nombre,TipoH|Cola],PokemonesRevueltos),	
+	HuevoEvolucionado=[Nombre,TipoH|Cola].	
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
+  
 
 caminarASiguienteCiudad:-
   preguntarCiudad,
@@ -438,7 +437,7 @@ preguntarSiPelea(NombreEntrenador,PokemonesEntrenador):-
 
 	% Pelear con Entrenador
 respuestaEntrenador(no,NombreEntrenador,_):-
-write("No peleaste con el entrenador "), write(NombreEntrenador),nl.
+write("No peleaste con el entrenador "),nl, write(NombreEntrenador).
 
 respuestaEntrenador(si,_,PokemonesEntrenador):-
 	retractall(puntosJugador(_,_)),
@@ -456,7 +455,6 @@ traerPokemonesEntrenador(NumeroDePokemones, PokemonesEntrenador):-
 	sacarElementos(NumeroDePokemones,PokemonesRevueltos,PokemonesEntrenador).
 
 peleaEntrenador([PokemonEnemigo|Cola]):-
-	retractall(tipoPelea(_)),
 	assert(tipoPelea(entrenador)),
 	iniciarPelea(PokemonEnemigo),
 	peleaEntrenador(Cola).
@@ -502,61 +500,28 @@ opcionesDeCiudad:-
 	write("0 = Ir a la tienda"),nl,
 	write("1 = Ir a enfermeria"),nl,
 	write("2 = Ir al gimnasio"),nl,
-	write("3 = Ir a la siguiente ciudad"),nl,
-	write("4 = Ver mis Pokemones"),nl,
-	write("5 = Ver Pokemones que tiene Bill"),nl,
-	write("6 = Ver Huevos"),nl,
-	write("7 = Ver Mis Pokebolas"),nl,nl,
+	write("3 = Ir a la siguiente ciudad"), nl,nl,
 	read(Respuesta),
 	opcionesDeCiudadRespuesta(Respuesta).
 
 opcionesDeCiudad:-
 	write("Respuesta invalida vuelve a intentarlo"),nl,
-	opcionesDeCiudad.
+	opcionesDeCiudad.	
 
 opcionesDeCiudadRespuesta(0):-
 	tienda,
 	opcionesDeCiudad.
-
+			
 opcionesDeCiudadRespuesta(1):-
 	curarPokemones,
 	opcionesDeCiudad.
 
 opcionesDeCiudadRespuesta(2):-
-	gimnasio,
-	opcionesDeCiudad.
+	gimnasio.
 opcionesDeCiudadRespuesta(3):-
-	 caminarASiguienteCiudad,
-	 opcionesDeCiudad.
+	 caminarASiguienteCiudad.	
 
-opcionesDeCiudadRespuesta(4):-
-	 pokemonesJugador(PokemonesActuales),nl,nl,nl,
-	 write("Lista de Pokemones Actuales"),nl,
-	 write("Nombre, tipo, salud, ataques, estado, nivel, experiencia"),nl,nl,
-	 impresionListaNormal(PokemonesActuales),nl,nl,nl,
-	 opcionesDeCiudad.
-
-opcionesDeCiudadRespuesta(5):-
-	 pokemonesconBill(PokemonesConBill),nl,nl,nl,
-	 write("Lista de Pokemones que se encuentran con Bill"),nl,
-	 write("Nombre, tipo, salud, ataques, estado, nivel, experiencia"),nl,nl,
-	 impresionListaNormal(PokemonesConBill),nl,nl,nl,
-	 opcionesDeCiudad.
-
-opcionesDeCiudadRespuesta(6):-
-	 huevosJugador(HuevosJugador),nl,nl,nl,
-	 write("Lista de Huevos que tengo: "),nl,
-	 write("Tipo, distancia para nacer"),nl,nl,
-	 impresionListaNormal(HuevosJugador),nl,nl,nl,
-	 opcionesDeCiudad.
-
-opcionesDeCiudadRespuesta(7):-
-	 pokebolasJugador(PokebolasActuales),nl,nl,nl,
-	 write("Lista de Pokebolas que tengo: "),nl,
-	 write("Nombre, costo, probabilidad de atrapar el Pokemon (%)"),nl,nl,
-	 impresionListaNormal(PokebolasActuales),nl,nl,nl,
-	 opcionesDeCiudad.
-
+	
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%&&&&&&&&&&&&&&&&&&&&&&&&&&&
 %%%%%%%%%%%%%%%%%%%%%%%%%%%              Encotrar huevo      				  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 encontrarHuevo:-
@@ -596,7 +561,7 @@ sacarPokemonRandom(Pokemon):-
 
 
 respuestaSobrePelea(no,_,_):-
-write("Te perdiste de un gran Pokemon"),nl.
+write("Te perdiste de un gran Pokemon :("),nl.
 
 respuestaSobrePelea(si,PokemonEnemigo, _):-
 	assert(tipoPelea(pokemon)),
@@ -641,7 +606,7 @@ peleaPokemones(Mipokemon,Pokemonenemigo):-
 	pokemonesPeleando(MiPokemon4,PokemonEnemigo4),
 	% write(" Mi pokemon final:"),write(MiPokemon4),nl,
 	% write(" El pokemon enemigo final:"),write(PokemonEnemigo4),nl,
-	quienGano(Mipokemon,MiPokemon4,PokemonEnemigo4).
+	quienGano(Mipokemon,MiPokemon4,PokemonEnemigo4). 
 
 peleaPokemones(Mipokemon,_):-
 	pokemonesPeleando(MiPokemon4,PokemonEnemigo4),
@@ -706,38 +671,27 @@ quienGano(Mipokemon,MiPokemonFinal,PokemonEnemigoFinal):-    			%Si gano nuestro
 	 SaludFinal >= SaludEnemigoFinal,
 	 actualizarExperienciaPokemon(MiPokemonFinal, MiPokemonFinalActualizado),
 	 actualizarPokemon(Mipokemon,MiPokemonFinalActualizado),
- 	write("Gano mi Pokemon "), write(NombreMiPokemon),nl,
- 	actualizarPuntosJugador(SaludEnemigoFinal),
+ 	write("Gano mi Pokemon "), write(NombreMiPokemon),nl, 
+ 	puntosJugador(Ganadas,AtaqueTotal),
+	 NuevasGanadas is Ganadas + 1,
+	 NuevoAtaqueTotal is AtaqueTotal + (100 - SaludEnemigoFinal),
+	 retractall(puntosJugador(_,_)),
+	 assert(puntosJugador(NuevasGanadas,NuevoAtaqueTotal)),
  	capturarPokemonDePelea(PokemonEnemigoFinal).
 
  quienGano(Mipokemon,MiPokemonFinal,PokemonEnemigoFinal):-  						%Si gano el pokemon enemigo
 	 MiPokemonFinal=[NombrePokemon,_,SaludFinal|_],
 	 PokemonEnemigoFinal=[_,_,SaludEnemigoFinal|_],
 	 SaludFinal < SaludEnemigoFinal,
-	 actualizarPokemon(Mipokemon,MiPokemonFinal),
+	  actualizarPokemon(Mipokemon,MiPokemonFinal),
 	 write("Gano el pokemon enemigo, sigue entrenando a tu Pokemon "), write(NombrePokemon),nl,
-	 actualizarPuntosEntrenador(SaludFinal),
+	 puntosEntrenador(Ganadas,AtaqueTotal),
+	 NuevasGanadas is Ganadas + 1,
+	 NuevoAtaqueTotal is AtaqueTotal + (100 - SaludFinal),
+	 retractall(puntosEntrenador(_,_)),
+	 assert(puntosEntrenador(NuevasGanadas,NuevoAtaqueTotal)),
 	 checarPokemonesVivos.
-
-actualizarPuntosJugador(SaludEnemigoFinal):-
-	tipoPelea(entrenador),
-	puntosJugador(Ganadas,AtaqueTotal),
- NuevasGanadas is Ganadas + 1,
- NuevoAtaqueTotal is AtaqueTotal + (100 - SaludEnemigoFinal),
- retractall(puntosJugador(_,_)),
- assert(puntosJugador(NuevasGanadas,NuevoAtaqueTotal)).
- actualizarPuntosJugador(_).
-
-
-actualizarPuntosEntrenador(SaludFinal):-
-	tipoPelea(entrenador),
-	puntosEntrenador(Ganadas,AtaqueTotal),
-	NuevasGanadas is Ganadas + 1,
-	NuevoAtaqueTotal is AtaqueTotal + (100 - SaludFinal),
-	retractall(puntosEntrenador(_,_)),
-	assert(puntosEntrenador(NuevasGanadas,NuevoAtaqueTotal)).
-actualizarPuntosEntrenador(_).
-
+ 	
  capturarPokemonDePelea(PokemonACapturar):-
  	tipoPelea(pokemon),
     pokebolasJugador(HayPokebolas),
@@ -755,19 +709,18 @@ capturarPokemonDePelea(_):-
 
 respuestaCapturarPokemon(no,PokemonACapturar):-
 	PokemonACapturar=[NombrePokEne,_,_|_],
-	write("Has dejado a "), write(NombrePokEne),nl.
+	write("Has dejado a "), write(NombrePokEne),nl. 
 
 
 respuestaCapturarPokemon(si,PokemonACapturar):-
-	write("Lista de pokebolas"),nl,
-	write("Nombre, costo, probabilidad de atrapar el Pokemon (%)"),nl,nl,
+	write("Lista de pokebolas"),nl,nl,
 	pokebolasJugador(PokebolasJ),
 	impresionListaNumerada(PokebolasJ),nl,
 	read(IndesP),
-	nth0(IndesP, PokebolasJ, PokebolaElegida),
+	nth0(IndesP, PokebolasJ, PokebolaElegida), 
 	tirarPokebola(PokebolaElegida,PokemonACapturar).
 
-
+	
 respuestaCapturarPokemon(si,PokemonACapturar):-
 	write("Valor invalido vuelve a intentarlo"),nl,
 	respuestaCapturarPokemon(si,PokemonACapturar).
@@ -783,7 +736,7 @@ tirarPokebola(PokebolaElegida,PokemonACapturar):-
 	assert(pokebolasJugador(ListaSinElemento)).
 
 
-tirarPokebola(PokebolaElegida,_):-		%Se eliminara la pokebola aque no se capture el pokemon
+tirarPokebola(PokebolaElegida,_):-		%Se eliminara la poquebola aque no se capture el pokemon
 	pokebolasJugador(PokebolasActuales),
 	eliminarElemento(PokebolaElegida,PokebolasActuales,ListaSinElemento),
 	retractall(pokebolasJugador(PokebolasActuales)),
@@ -804,7 +757,7 @@ agregarPokemonALaMochila(NuevoPokemon,_):-
 	write("Se agrego exitosamente el pokemon a la mochila"),nl.
 
 agregarPokemonALaMochila(NuevoPokemon,PokebolaElegida):-
-	preguntarGuardadoPokemon(Respuesta), % Preguntar
+	preguntarGuardadoPokemon(Respuesta), % Preguntar 
     posibilidadConPokemon(Respuesta,NuevoPokemon,PokebolaElegida).
 
 preguntarGuardadoPokemon(Respuesta):-
@@ -863,15 +816,6 @@ impresionListaNumerada([Cabeza|Cola],Contador):-
 
 impresionListaNumerada(Lista):-impresionListaNumerada(Lista,0).
 
-%%Impresion lista Normal
-impresionListaNormal([]).
-
-impresionListaNormal([Cabeza|Cola]):-
-    write(Cabeza),nl,
-	impresionListaNormal(Cola).
-
-impresionListaNormal(Lista):-impresionListaNormal(Lista).
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%&&&&&&&&&&&&&&&&&&&&&&&&&&&
 %%%%%%%%%%%%%%%%%%%%%%%%%%%           Agregar una pokebola a la mochila 	  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -891,7 +835,7 @@ agregarHuevoALaMochila(NuevoHuevo):-
 
 preguntarCiudad:-
 	ciudadActual(CiudadActual),
-	mostrarOpcionesDeViaje(CiudadActual),
+	mostrarOpcionesDeViaje(CiudadActual), 
 	ciudades(X),
 	read(CiudadParaIr),
 	estaDentro(CiudadParaIr,X),nl,
@@ -1086,7 +1030,8 @@ checarMedallas.
 %% PROME1 = [2|PROMESA2]= [2|[3]]
 %% PREMESA2 = [3|PROMESA3] = [3].
 %% PROMESA3 =[]
-
+	
 %% [3|[]] = [3]
 %% [2|[3]] = [2,3].
 %% [1|[2,3]]= [1,2,3]
+
